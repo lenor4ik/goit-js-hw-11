@@ -46,11 +46,10 @@ function getImage(e) {
   setTimeout(() => {
     showImage(searchName)
       .then(data => {
-        if (searchName.length > 0) {
+        if (searchName.length > 0 && data.hits.length> 0) {
           renderImages(data.hits);
           lightbox.refresh();
         } else {
-          document.querySelector('.gallery').innerHTML = "";
           iziToast.error({
             message: 'Sorry, there are no images matching<br> your search query. Please try again!',
             position: 'topRight',
