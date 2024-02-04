@@ -50,7 +50,7 @@ function getImage(e) {
           renderImages(data.hits);
           lightbox.refresh();
         } else {
-          document.querySelector('.gallery').innerHTML = '';
+          document.querySelector('.gallery').innerHTML = "";
           iziToast.error({
             message: 'Sorry, there are no images matching<br> your search query. Please try again!',
             position: 'topRight',
