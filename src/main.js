@@ -1,3 +1,4 @@
+import './css/styles.css';
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 import SimpleLightbox from "simplelightbox";
@@ -30,6 +31,7 @@ const lightbox = new SimpleLightbox('.gallery a', lightboxConfig);
 function showLoader() {
   const loader = document.getElementById('loader');
   loader.style.display = 'block';
+  document.querySelector('.gallery').innerHTML = "";
 }
 
 function hideLoader() {
@@ -39,21 +41,18 @@ function hideLoader() {
 
 function getImage(e) {
   e.preventDefault();
-
   const searchName = e.target.elements.name.value;
-  console.log(searchName);
   showLoader();
-
   setTimeout(() => {
     showImage(searchName)
       .then(data => {
-        if (data.hits.length > 0) {
-          console.log(data.hits);
+        if (searchName.length > 0) {
           renderImages(data.hits);
           lightbox.refresh();
         } else {
+          document.querySelector('.gallery').innerHTML = '';
           iziToast.error({
-            message: 'Sorry, there are no images matching your search query. Please try again!',
+            message: 'Sorry, there are no images matching<br> your search query. Please try again!',
             position: 'topRight',
             messageColor: '#fafafb',
             backgroundColor: '#ef4040',
@@ -63,6 +62,7 @@ function getImage(e) {
         }
       })
       .catch(error => {
+        console.error(error);
         iziToast.error({
           message: 'An error occurred while fetching images. Please try again!',
           position: 'topRight',
