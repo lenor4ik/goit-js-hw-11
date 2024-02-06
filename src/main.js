@@ -5,7 +5,7 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import errorIcon from './img/bi_x-octagon.png';
 
-document.addEventListener('submit', getImage);
+document.addEventListener('submit', onFormSubmit);
 
 function showImage(searchName) {
     const BASE_URL = 'https://pixabay.com/api/';
@@ -19,7 +19,17 @@ function showImage(searchName) {
     })
     const url = BASE_URL+END_POINT+PARAMS;
 
-    return fetch(url).then(res => res.json());  
+  return fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .catch(error => {
+      console.error(error);
+      throw new Error('Error fetching images from the server');
+    });
 }
 
 const lightboxConfig = {
@@ -39,14 +49,27 @@ function hideLoader() {
   loader.style.display = 'none';
 }
 
-function getImage(e) {
+function onFormSubmit(e) {
   e.preventDefault();
   const searchName = e.target.elements.name.value;
+
+  if (searchName.trim().length === 0) {
+    iziToast.error({
+      message: 'Please enter a valid search term!',
+      position: 'topRight',
+      messageColor: '#fafafb',
+      backgroundColor: '#ef4040',
+      iconUrl: errorIcon,
+      iconColor: '#ffffff',
+    });
+    return; 
+  }
+  
   showLoader();
-  setTimeout(() => {
+
     showImage(searchName)
       .then(data => {
-        if (searchName.length > 0 && data.hits.length> 0) {
+        if (searchName.length > 0 && data.hits.length > 0) {
           renderImages(data.hits);
           lightbox.refresh();
         } else {
@@ -60,23 +83,11 @@ function getImage(e) {
           });
         }
       })
-      .catch(error => {
-        console.error(error);
-        iziToast.error({
-          message: 'An error occurred while fetching images. Please try again!',
-          position: 'topRight',
-          messageColor: '#fafafb',
-          backgroundColor: '#ef4040',
-          iconUrl: errorIcon,
-          iconColor: '#ffffff',
-        });
-      })
       .finally(() => {
         hideLoader();
         e.target.reset();
       });
-  }, 1000);
-}
+  }
 
 function imageTemplate({ webformatURL, largeImageURL, tags, likes, views, comments, downloads}) {
     return `<li class="gallery-item">
